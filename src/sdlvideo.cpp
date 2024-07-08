@@ -480,13 +480,14 @@ void ScaleWithAspect (int &w, int &h, int Width, int Height)
 	double yratio;
 	switch(resRatio)
 	{
-		case 0: yratio = 4./3.; break;
-		case 1: yratio = 16./9.; break;
-		case 2: yratio = 16./10.; break;
-		case 3: yratio = 17./10.; break;
-		case 4: yratio = 5./4.; break;
-		case 5: yratio = 64./27.; break;
-		case 6: yratio = 32./9.; break;
+		case ASPECT_NONE: yratio = 4./3.; break;
+		case ASPECT_16_9: yratio = 16./9.; break;
+		case ASPECT_16_10: yratio = 16./10.; break;
+		case ASPECT_17_10: yratio = 17./10.; break;
+		case ASPECT_5_4: yratio = 5./4.; break;
+		case ASPECT_4_3: yratio = 4./3.; break;
+		case ASPECT_64_27: yratio = 64./27.; break;
+		case ASPECT_32_9: yratio = 32./9.; break;
 		default: return;
 	}
 	double y = w/yratio;
