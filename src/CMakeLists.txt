@@ -353,8 +353,8 @@ if(NOT ANDROID)
 
 	if(NOT WIN32 AND NOT APPLE)
 		configure_file(posix/engine.desktop.in posix/engine.desktop)
-		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/posix/engine.desktop" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications" RENAME "${ENGINE_BINARY_NAME}.desktop")
-		install(FILES "posix/icon.svg" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps" RENAME "${ENGINE_BINARY_NAME}.svg")
+		install(FILES "${CMAKE_CURRENT_BINARY_DIR}/posix/engine.desktop" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications" RENAME "${PRODUCT_IDENTIFIER}.desktop")
+		install(FILES "posix/icon.svg" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps" RENAME "${PRODUCT_IDENTIFIER}.svg")
 	endif()
 endif()
 

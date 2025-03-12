@@ -223,6 +223,8 @@ if(NOT APPLE)
 		install(FILES docs/copyright DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 		install(FILES docs/changelog DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 		install(FILES docs/ecwolf.6 DESTINATION "${CMAKE_INSTALL_MANDIR}/man6")
+		# this installs the Appstream Metainfo file (used by Flatpak)
+		install(FILES docs/org.ecwolf.ECWolf.metainfo.xml DESTINATION "${CMAKE_INSTALL_DATADIR}/metainfo")
 
 		# Lintian requires that man pages in deb packages are compressed.
 		find_program(GZIP_BINARY NAMES gzip DOC "gzip program for man page compression.")
