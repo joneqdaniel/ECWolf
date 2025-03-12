@@ -43,9 +43,10 @@ include(CPack)
 
 # Multiarch support
 if(UNIX AND NOT APPLE)
-	# We are in the games section
-	set(CMAKE_INSTALL_BINDIR "games")
-
+	# Default to "games" as per the Debian packaging guidelines
+	# However, it can be overridden for other distributions or as needed
+	set(CMAKE_INSTALL_BINDIR "games" CACHE STRING "Installation directory for binaries")
+	# Include GNUInstallDirs to get standard install directories
 	include(GNUInstallDirs)
 	if(CPACK_PACKAGE_NAME)
 		# Match this to package name instead of project name
