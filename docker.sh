@@ -146,7 +146,7 @@ dockerfile_ubuntu_minimum() {
 		apt-get install g++ cmake git pax-utils lintian sudo \
 			libsdl1.2-dev libsdl-net1.2-dev \
 			libsdl2-dev libsdl2-net-dev \
-			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
+			libflac-dev libogg-dev libopus-dev libopusfile-dev libfluidsynth-dev libxmp-dev \
 			zlib1g-dev libbz2-dev libgtk-3-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
@@ -230,7 +230,7 @@ export -f test_build_ecwolf
 declare -A ConfigUbuntuMinimum=(
 	[dockerfile]=dockerfile_ubuntu_minimum
 	[dockerimage]='ecwolf-ubuntu'
-	[dockertag]=6
+	[dockertag]=7
 	[dockerarch]=amd64
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
@@ -241,7 +241,7 @@ declare -A ConfigUbuntuMinimum=(
 declare -A ConfigUbuntuMinimumI386=(
 	[dockerfile]=dockerfile_ubuntu_minimum_i386
 	[dockerimage]='ecwolf-ubuntu-i386'
-	[dockertag]=6
+	[dockertag]=7
 	[dockerarch]=i386
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
@@ -252,7 +252,7 @@ declare -A ConfigUbuntuMinimumI386=(
 declare -A ConfigUbuntuMinimumArmHf=(
 	[dockerfile]=dockerfile_ubuntu_minimum_armhf
 	[dockerimage]='ecwolf-ubuntu-armhf'
-	[dockertag]=2
+	[dockertag]=3
 	[dockerarch]=arm
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
@@ -263,7 +263,7 @@ declare -A ConfigUbuntuMinimumArmHf=(
 declare -A ConfigUbuntuMinimumArm64=(
 	[dockerfile]=dockerfile_ubuntu_minimum_arm64
 	[dockerimage]='ecwolf-ubuntu-arm64'
-	[dockertag]=2
+	[dockertag]=3
 	[dockerarch]=arm64
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
@@ -281,23 +281,23 @@ dockerfile_ubuntu_package() {
 	# Static link libFLAC due to ABI 8 -> 12 transition
 	cat <<-'EOF'
 		RUN cd ~ && \
-		curl https://cmake.org/files/v3.26/cmake-3.26.4.tar.gz | tar xz && \
-		cd cmake-3.26.4 && \
+		curl https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz | tar xz && \
+		cd cmake-4.1.1 && \
 			./configure --parallel="$(nproc)" --prefix=/usr && \
 			make -j "$(nproc)" && \
 			sudo make install/strip && \
 		cd .. && \
-		rm -rf cmake-3.26.4 && \
-		curl https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.4.3.tar.xz | tar xJ && \
-		mkdir flac-1.4.3/build && \
-		cd flac-1.4.3/build && \
+		rm -rf cmake-4.1.1 && \
+		curl https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz | tar xJ && \
+		mkdir flac-1.5.0/build && \
+		cd flac-1.5.0/build && \
 			cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_CXXLIBS=OFF -DBUILD_DOCS=OFF \
 			         -DBUILD_DOXYGEN=OFF -DBUILD_EXAMPLES=OFF -DBUILD_PROGRAMS=OFF -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF -DBUILD_UTILS=OFF \
 			         -DINSTALL_CMAKE_CONFIG_MODULE=OFF -DINSTALL_MANPAGES=OFF && \
 			make -j "$(nproc)" && \
 			sudo make install/strip && \
 		cd ../.. && \
-		rm -rf flac-1.4.3 && \
+		rm -rf flac-1.5.0 && \
 		sudo rm /usr/lib/*/libFLAC.so
 	EOF
 }
@@ -319,6 +319,7 @@ package_ecwolf() {
 		build_ecwolf &&
 
 		make package &&
+		lddtree _CPack_Packages/Linux/DEB/ecwolf-*/usr/games/ecwolf &&
 		lintian --suppress-tags embedded-library ecwolf_*.deb &&
 		cp ecwolf_*.deb /results/
 	} 2>&1 | tee '/results/build.log'
@@ -330,7 +331,7 @@ export -f package_ecwolf
 declare -A ConfigUbuntuPackage=(
 	[dockerfile]=dockerfile_ubuntu_package
 	[dockerimage]='ecwolf-ubuntu-package'
-	[dockertag]=6
+	[dockertag]=7
 	[dockerarch]=amd64
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimum
@@ -341,7 +342,7 @@ declare -A ConfigUbuntuPackage=(
 declare -A ConfigUbuntuPackageI386=(
 	[dockerfile]=dockerfile_ubuntu_package_i386
 	[dockerimage]='ecwolf-ubuntu-package-i386'
-	[dockertag]=6
+	[dockertag]=7
 	[dockerarch]=i386
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumI386
@@ -352,7 +353,7 @@ declare -A ConfigUbuntuPackageI386=(
 declare -A ConfigUbuntuPackageArmHf=(
 	[dockerfile]=dockerfile_ubuntu_package_armhf
 	[dockerimage]='ecwolf-ubuntu-package-armhf'
-	[dockertag]=2
+	[dockertag]=3
 	[dockerarch]=arm
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumArmHf
@@ -363,7 +364,7 @@ declare -A ConfigUbuntuPackageArmHf=(
 declare -A ConfigUbuntuPackageArm64=(
 	[dockerfile]=dockerfile_ubuntu_package_arm64
 	[dockerimage]='ecwolf-ubuntu-package-arm64'
-	[dockertag]=2
+	[dockertag]=3
 	[dockerarch]=arm64
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumArm64
@@ -380,7 +381,7 @@ dockerfile_clang() {
 		TZ=America/New_York DEBIAN_FRONTEND=noninteractive apt-get install \
 			clang-12 libc++-12-dev libc++abi-12-dev cmake git pax-utils lintian sudo \
 			libsdl2-dev libsdl2-net-dev \
-			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
+			libflac-dev libogg-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev libxmp-dev \
 			zlib1g-dev libbz2-dev libgtk-3-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
@@ -410,7 +411,7 @@ export -f clang_build_ecwolf
 declare -A ConfigClang=(
 	[dockerfile]=dockerfile_clang
 	[dockerimage]='ecwolf-clang'
-	[dockertag]=7
+	[dockertag]=8
 	[dockerarch]=amd64
 	[entrypoint]=clang_build_ecwolf
 	[prereq]=''
@@ -421,7 +422,7 @@ declare -A ConfigClang=(
 
 dockerfile_mingw() {
 	cat <<-'EOF'
-		FROM ubuntu:22.04
+		FROM ubuntu:24.04
 
 		RUN apt-get update && \
 		apt-get install g++ cmake git g++-mingw-w64-i686 g++-mingw-w64-x86-64 \
@@ -470,7 +471,7 @@ export -f build_mingw
 declare -A ConfigMinGW=(
 	[dockerfile]=dockerfile_mingw
 	[dockerimage]='ecwolf-mingw'
-	[dockertag]=4
+	[dockertag]=5
 	[dockerarch]=amd64
 	[entrypoint]=build_mingw
 	[prereq]=''
@@ -481,13 +482,10 @@ declare -A ConfigMinGW=(
 
 dockerfile_android() {
 	cat <<-'EOF'
-		FROM ubuntu:22.04
+		FROM ubuntu:24.04
 
-		RUN dpkg --add-architecture i386 && \
-		apt-get update && \
-		apt-get install libc6:i386 libstdc++6:i386 zlib1g:i386 libtinfo5 \
-			g++ cmake git openjdk-17-jdk-headless p7zip-full curl \
-			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev -y && \
+		RUN apt-get update && \
+		apt-get install cmake curl g++ git openjdk-21-jdk-headless zlib1g-dev libbz2-dev -y && \
 		rm -rf /var/lib/apt/lists/* && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
@@ -496,17 +494,17 @@ dockerfile_android() {
 		ln -s /home/ecwolf/results /results && \
 		mkdir sdk && \
 		cd sdk && \
-		curl https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o commandlinetools-linux.zip && \
+		curl https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip -o commandlinetools-linux.zip && \
 		curl https://dl.google.com/android/repository/android-ndk-r17c-linux-x86_64.zip -o android-ndk.zip && \
-		7za x commandlinetools-linux.zip && \
-		7za x android-ndk.zip && \
+		cmake -E tar xf commandlinetools-linux.zip && \
+		cmake -E tar xf android-ndk.zip && \
 		rm commandlinetools-linux.zip android-ndk.zip && \
 		mv android-ndk-r17c ndk-bundle && \
 		mv cmdline-tools latest && \
 		mkdir cmdline-tools && \
 		mv latest cmdline-tools && \
 		yes | cmdline-tools/latest/bin/sdkmanager --licenses && \
-		cmdline-tools/latest/bin/sdkmanager 'platforms;android-26' 'build-tools;34.0.0' 'extras;android;m2repository' && \
+		cmdline-tools/latest/bin/sdkmanager 'platforms;android-31' 'build-tools;36.0.0' 'extras;android;m2repository' && \
 		keytool -genkey -keystore untrusted.keystore -storepass untrusted -keypass untrusted -alias untrusted -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Untrusted,OU=Untrusted,O=Untrusted,L=Untrusted,S=Untrusted,C=US" -noprompt
 
 		USER ecwolf
@@ -536,8 +534,8 @@ build_android() {
 				-DCMAKE_BUILD_TYPE=Release \
 				-DFORCE_CROSSCOMPILE=ON \
 				-DIMPORT_EXECUTABLES=~/build/ImportExecutables.cmake \
-				-DANDROID_SDK=/sdk/platforms/android-26 \
-				-DANDROID_SDK_TOOLS=/sdk/build-tools/34.0.0 \
+				-DANDROID_SDK=/sdk/platforms/android-31 \
+				-DANDROID_SDK_TOOLS=/sdk/build-tools/36.0.0 \
 				-DANDROID_SIGN_KEYNAME=untrusted \
 				-DANDROID_SIGN_KEYSTORE=/sdk/untrusted.keystore \
 				-DANDROID_SIGN_STOREPASS=untrusted \
@@ -554,7 +552,7 @@ export -f build_android
 declare -A ConfigAndroid=(
 	[dockerfile]=dockerfile_android
 	[dockerimage]='ecwolf-android'
-	[dockertag]=5
+	[dockertag]=6
 	[dockerarch]=amd64
 	[entrypoint]=build_android
 	[prereq]=''
