@@ -347,6 +347,49 @@ set_target_properties(engine PROPERTIES
 	BUILD_WITH_INSTALL_RPATH ON
 )
 
+# Windows console wrapper
+if(WIN32)
+	add_executable(engine-console win32/console-wrapper.c)
+	set_target_properties(engine-console PROPERTIES
+		OUTPUT_NAME "${ENGINE_BINARY_NAME}-console"
+		RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}"
+	)
+	target_link_libraries(engine-console PRIVATE shlwapi)
+
+	if(MSVC)
+		# This program doesn't actually need the C runtime
+		if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)
+			target_compile_options(engine-console PRIVATE /GS-)
+			target_link_options(engine-console PRIVATE /NODEFAULTLIB /ENTRY:wmain)
+			set_target_properties(engine-console PROPERTIES MSVC_RUNTIME_CHECKS "")
+		else()
+			target_compile_options(engine-console PRIVATE $<$<NOT:$<CONFIG:Debug>>:/GS->)
+			if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13)
+				target_link_options(engine-console PRIVATE $<$<NOT:$<CONFIG:Debug>>:/NODEFAULTLIB> $<$<NOT:$<CONFIG:Debug>>:/ENTRY:wmain>)
+			else()
+				set_target_properties(engine-console PROPERTIES
+					LINK_FLAGS_RELEASE "/NODEFAULTLIB /ENTRY:wmain"
+					LINK_FLAGS_RELWITHDEBINFO "/NODEFAULTLIB /ENTRY:wmain"
+					LINK_FLAGS_MINSIZEREL "/NODEFAULTLIB /ENTRY:wmain"
+				)
+			endif()
+		endif()
+
+		# Legacy Visual C++ has terrible C support
+		if(MSVC_VERSION LESS 1900)
+			set_source_files_properties(win32/console-wrapper.c PROPERTIES LANGUAGE CXX)
+		endif()
+	else()
+		target_link_options(engine-console PRIVATE -municode)
+		# Workarounds for static linking MinGW runtimes interfere with our ability to trim down this binary
+		if(NOT CMAKE_EXE_LINKER_FLAGS MATCHES "--whole-archive")
+			target_link_options(engine-console PRIVATE -nodefaultlibs -nostartfiles --entry=_wmain)
+		endif()
+	endif()
+
+	install(TARGETS engine-console BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
+endif()
+
 # Install
 if(NOT ANDROID)
 	install(TARGETS engine BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)

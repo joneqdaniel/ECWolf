@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6.0...3.27.0)
+cmake_minimum_required(VERSION 3.6.0...4.1)
 project(ECWolf)
 
 if(POLICY CMP0054)
