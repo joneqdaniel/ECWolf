@@ -335,7 +335,7 @@ static const char* const KeyNames[512] =
 	"?","?","?","?","?","?","?","?",                                // 240
 	"?","?","?","?","?","?","?","?",                                // 248
 	"KP0","KP1","KP2","KP3","KP4","KP5","KP6","KP7",                // 256
-	"KP8","KP9","Perd","Divd","Mult","Plus","Mins","Entr",          // 264
+	"KP8","KP9","Perd","Divd","Mult","Mins","Plus","Entr",          // 264
 	"Equl","Up","Down","Rght","Left","Ins","Home","End",            // 272
 	"PgUp","PgDn","F1","F2","F3","F4","F5","F6",                    // 280
 	"F7","F8","F9","F10","F11","F12","F13","F14",                   // 288
