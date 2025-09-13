@@ -1114,7 +1114,7 @@ void CheckSpawnPlayer(bool setup)
 			if(players[p].mo == NULL)
 			{
 				FString err;
-				err.Format("No player %u start!", p);
+				err.Format("No player %u start!", p+1);
 				throw CRecoverableError(err);
 			}
 		}
