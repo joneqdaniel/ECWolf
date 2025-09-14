@@ -349,6 +349,9 @@ const GameMap::PlayerSpawn *GameMap::GetPlayerSpawn(int player) const
 {
 	if(Net::InitVars.gameMode == Net::GM_Battle)
 	{
+		if(deathmatchStarts.Size() == 0)
+			return NULL;
+
 		// Spawn farthest
 		unsigned int best = 0;
 		fixed distance = 0;
@@ -380,6 +383,9 @@ const GameMap::PlayerSpawn *GameMap::GetPlayerSpawn(int player) const
 
 	if(const PlayerSpawn *spawn = playerStarts.CheckKey(player))
 		return spawn;
+
+	if(playerStarts.CountUsed() == 0)
+		return NULL;
 
 	// No direct spawn, so overlap with another player, but if possible divide
 	// amongst any additional spawn points available

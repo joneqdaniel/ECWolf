@@ -194,7 +194,7 @@ static const wchar_t* GetExecutablePath()
 		return NULL;
 	DWORD nSize = GetModuleFileName(NULL, filePath, MAX_PATH);
 
-	if(nSize == MAX_PATH && StrCmpN(filePath, L"//?/", 4) == 0)
+	if(nSize == MAX_PATH && StrCmpN(filePath, L"\\\\?\\", 4) == 0)
 	{
 		wchar_t* newFilePath = (wchar_t*)LocalReAlloc(filePath, 0x7FFF * sizeof(wchar_t), 0);
 		if(!newFilePath)

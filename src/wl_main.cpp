@@ -409,15 +409,15 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
-#if SDL_VERSION_ATLEAST(2,0,0)
 	{
 		SDL_version ver;
+#if SDL_VERSION_ATLEAST(2,0,0)
 		SDL_GetVersion(&ver);
+#else
+		ver = *SDL_Linked_Version();
+#endif
 		printf("SDL_Init: Using SDL %d.%d.%d\n", ver.major, ver.minor, ver.patch);
 	}
-#else
-	printf("SDL_Init: Using SDL 1.2\n");
-#endif
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 	if(SDL_Init(0) < 0)
@@ -427,8 +427,6 @@ static void InitGame()
 	{
 		I_FatalError("Unable to init SDL: %s", SDL_GetError());
 	}
-
-	SDL_ShowCursor(SDL_DISABLE);
 
 	//
 	// Mapinfo
@@ -1299,6 +1297,10 @@ int WL_Main (int argc, char *argv[])
 
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);
+
+			// Normalize path separators as ZDoom code expects
+			for(unsigned int i = 0;i < files.Size();++i)
+				files[i].ReplaceChars('\\', '/');
 
 			printf("W_Init: Init WADfiles.\n");
 			Wads.InitMultipleFiles(files);

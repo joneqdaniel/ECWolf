@@ -171,7 +171,7 @@ if(GPL)
 
 	if(USE_LIBTEXTSCREEN)
 		target_compile_definitions(engine PRIVATE -DUSE_TEXTSCREEN)
-		target_link_directories(engine PRIVATE textscreen)
+		target_link_libraries(engine PRIVATE textscreen)
 	endif()
 else()
 	target_sources(engine PRIVATE mame/fmopl.cpp)
