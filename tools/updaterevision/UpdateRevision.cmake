@@ -16,7 +16,7 @@ endmacro()
 # from source repository.  If anything goes wrong return something in "Error."
 function(query_repo_info)
 	execute_process(
-		COMMAND git describe --tags --dirty=-m
+		COMMAND git describe --tags --first-parent --dirty=-m
 		RESULT_VARIABLE Error
 		OUTPUT_VARIABLE Tag
 		ERROR_QUIET
