@@ -72,6 +72,16 @@ static TArray<LevelSet> levelSets;
 static const IWadData *selectedGame;
 static unsigned int NumIWads;
 
+static bool CheckIWadNotYetFound(const TArray<WadStuff> &iwads, int type)
+{
+	for(unsigned int i = 0; i < iwads.Size(); ++i)
+	{
+		if(iwads[i].Type == type)
+			return false;
+	}
+	return true;
+}
+
 // Insert Paths from one WadStuff into another when Required is satisfied
 static void TransferWadStuffPaths(WadStuff &dest, const WadStuff &src)
 {
@@ -168,7 +178,7 @@ static bool CheckStandalone(const char* directory, FString filename, FString ext
 			TUniquePtr<unsigned int[]> valid(new unsigned int[iwadTypes.Size()]);
 			memset(valid.Get(), 0, sizeof(unsigned int)*iwadTypes.Size());
 
-			if((wad.Type = CheckFileContents(file, valid)) >= 0)
+			if((wad.Type = CheckFileContents(file, valid)) >= 0 && CheckIWadNotYetFound(iwads, wad.Type))
 			{
 				wad.Path.Push(path);
 				wad.Extension = extension;
@@ -401,16 +411,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		if(CheckData(wadStuff) > -1)
 		{
 			// Check to ensure there are no duplicates
-			bool doPush = true;
-			for(unsigned int j = 0;j < iwads.Size();++j)
-			{
-				if(iwads[j].Type == wadStuff.Type)
-				{
-					doPush = false;
-					break;
-				}
-			}
-			if(doPush)
+			if(CheckIWadNotYetFound(iwads, wadStuff.Type))
 			{
 				if(iwadTypes[wadStuff.Type].Required.Size() > 0 ||
 					(foundFiles[i].isValid & FILE_REQMASK) == FILE_REQMASK)
