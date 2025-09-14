@@ -1298,6 +1298,10 @@ int WL_Main (int argc, char *argv[])
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);
 
+			// Normalize path separators as ZDoom code expects
+			for(unsigned int i = 0;i < files.Size();++i)
+				files[i].ReplaceChars('\\', '/');
+
 			printf("W_Init: Init WADfiles.\n");
 			Wads.InitMultipleFiles(files);
 			LumpRemapper::RemapAll();

@@ -260,6 +260,15 @@ static void DrawLSAction (int which)
 	VW_UpdateScreen ();
 }
 
+// ECWolf <1.4.2 for Windows saved full filepaths due to ZDoom code expecting
+// all file paths to have Unix path separators. Look for Windows path
+// separators and strip the paths.
+static const char* NormalizeSavedFilename(const char* filename)
+{
+	const char* backslash = strrchr(filename, '\\');
+	return backslash ? backslash + 1 : filename;
+}
+
 ////////////////////////////////////////////////////////////////////
 //
 // SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
@@ -320,7 +329,7 @@ bool SetupSaveGames()
 				char* checkFile = M_GetPNGText(png, "Map WAD");
 				if(checkFile)
 				{
-					if(Wads.CheckIfWadLoaded(checkFile) < 0 && !param_foreginsave)
+					if(Wads.CheckIfWadLoaded(NormalizeSavedFilename(checkFile)) < 0 && !param_foreginsave)
 						sFile.hasFiles = false;
 					delete[] checkFile;
 				}
@@ -336,7 +345,7 @@ bool SetupSaveGames()
 					do
 					{
 						nextIndex = checkString.IndexOf(';', lastIndex);
-						if(Wads.CheckIfWadLoaded(checkString.Mid(lastIndex, nextIndex-lastIndex)) < 0 && !param_foreginsave)
+						if(Wads.CheckIfWadLoaded(NormalizeSavedFilename(checkString.Mid(lastIndex, nextIndex-lastIndex))) < 0 && !param_foreginsave)
 						{
 							sFile.hide = true;
 							break;
